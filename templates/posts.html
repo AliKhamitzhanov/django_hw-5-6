@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block post %}
+    <div style="text-align: center; height: 40vh; width: 50vh;">
+        {% for post in posts %}
+            <div style="display: grid; background-color: #f5dd5d; margin-bottom: 30px">
+                <img src="media/{{ post.image }}" style="width: 30vh">
+                {% if post.stars > 2 %}
+                    <h3 style="color: green">{{ post.title }}</h3>
+                {% else %}
+                    <h3 style="color: red">{{ post.title }}</h3>
+                {% endif %}
+                <h5>{{ post.description }}</h5>
+                <p>Stars: {{ post.stars }}</p>
+                <p>Type: {{ post.type }}</p>
+                <button style="background-color: #417690">
+                    <a href="posts/{{ post.id }}/">
+                        <p>
+                            More
+                        </p>
+                    </a>
+                </button>
+                <div class="edit_post"><a href="posts/{{ post.id }}/edit"><button>Изменить пост</button></a></div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
