@@ -11,14 +11,15 @@ def get_user_from_request(request):
 
 
 def main(request):
-    posts = Post.objects.all()
+    if request.method == 'GET':
+        posts = Post.objects.all()
 
-    data = {
-        'posts': posts,
-        'user': get_user_from_request(request),
-    }
+        data = {
+            'posts': posts,
+            'user': get_user_from_request(request),
+        }
 
-    return render(request, 'posts.html', context=data)
+        return render(request, 'posts.html', context=data)
 
 
 def post_detail(request, id):
