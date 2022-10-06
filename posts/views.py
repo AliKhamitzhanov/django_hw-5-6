@@ -57,10 +57,14 @@ def post_detail(request, id):
 
 def reg_post(request):
     if request.method == 'GET':
-        return render(request, 'reg_post.html', context={
-            'post_form': PostForm,
-            'user': get_user_from_request(request)
-        })
+        if get_user_from_request(request):
+            return render(request, 'reg_post.html', context={
+                'post_form': PostForm,
+                'user': get_user_from_request(request)
+            })
+        else:
+            return redirect('/')
+
 
     elif request.method == 'POST':
         form = PostForm(request.POST)
