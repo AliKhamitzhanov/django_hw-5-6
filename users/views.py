@@ -1,8 +1,37 @@
 from django.shortcuts import render
-from users.forms import RegisterForm, LoginForm
+from users.forms import RegisterForm, LoginForm, SetPassForm
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
+from posts.views import get_user_from_request
+
+
+def set_password(request, id):
+    if request.method == 'GET':
+        return render(request, 'users/change.html', context={
+            'pers': SetPassForm,
+            'id': id
+        })
+    elif request.method == 'POST':
+        form = SetPassForm(request.POST)
+        user = User.objects.get(id=id)
+        if form.is_valid():
+            user.set_password(form.cleaned_data.get('password'))
+            user.save()
+            return redirect('/')
+        else:
+            return render(request, 'users/change.html', context={
+                'pers': SetPassForm,
+                'id': id
+            })
+
+
+def personal_info(request):
+    if request.method == 'GET':
+        if get_user_from_request(request):
+            return render(request, 'users/personal.html', context={'user': request.user})
+        else:
+            return redirect('/')
 
 
 def register_view(request):
@@ -17,6 +46,8 @@ def register_view(request):
                 username=form.cleaned_data.get('username'),
                 email=form.cleaned_data.get('email'),
                 password=form.cleaned_data.get('password'),
+                first_name=form.cleaned_data.get('first_name'),
+                last_name=form.cleaned_data.get('last_name'),
             )
             return redirect("/users/login/")
 
@@ -48,3 +79,4 @@ def logout_view(request):
     if request.method == 'GET':
         logout(request)
         return redirect('/')
+

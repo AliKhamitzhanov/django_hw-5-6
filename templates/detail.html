@@ -23,7 +23,7 @@
         </div>
     </div>
     {% if user %}
-        <form action="/posts/{{ post.id }}/" method="post">
+        <form action="/posts/{{ post.id }}/detail/" method="post">
             {% csrf_token %}
             {{ comment_form.as_p}}
             <input type="submit" value="Создать коммент">

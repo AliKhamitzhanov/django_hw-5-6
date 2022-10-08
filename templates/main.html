@@ -53,6 +53,12 @@
     </div>
 </nav>
 
+<div class="comment_reg">
+    {% block comment %}
+
+    {% endblock %}
+</div>
+
 <div style="display: flex; justify-content: center">
     <div class="posts">
         {% block posts %}
@@ -65,7 +71,12 @@
 
         {% endblock %}
     </div>
+</div>
 
+<div class="personal">
+    {% block personal %}
+
+    {% endblock %}
 </div>
 
 </body>
