@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.http import HttpResponse
 
-from posts import forms
 from posts.forms import PostForm, CommentForm
 from posts.models import Post, Comment
 from posts.constants import PAGINATION_LIMIT
-from django.views import View
-from django.views.generic import ListView, CreateView, DeleteView
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 
 
 def get_user_from_request(request):
@@ -18,8 +16,11 @@ class MainView(ListView):
     template_name = 'posts.html'
     context_object_name = 'posts'
 
-    # def  get_context_data(self, **kwargs):
-    #     return
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return {
+                'posts': self.queryset,
+                'user': get_user_from_request(self.request)
+            }
 
     def get(self, request, **kwargs):
         page = int(request.GET.get('page', 1))
@@ -39,6 +40,7 @@ class MainView(ListView):
         }
 
         return render(request, self.template_name, context=data)
+
     # def get(self, request, **kwargs):
     #     page = int(request.GET.get('page', 1))
     #     pages = len(self.queryset) // PAGINATION_LIMIT
@@ -100,10 +102,26 @@ class RegPostView(CreateView):
     form_class = PostForm
 
     def get(self, request, **kwargs):
-        return render(request, self.template_name, context={
-            'post_form': self.form_class
-        })
+        if get_user_from_request(request):
+            return render(request, self.template_name, context={
+                'post_form': self.form_class
+            })
+        return redirect('/')
 
+    def reg_post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            Post.objects.create(
+                title=form.cleaned_data.get("title"),
+                description=form.cleaned_data.get("description"),
+                stars=form.cleaned_data.get("stars"),
+                type=form.cleaned_data.get("type")
+            )
+            return redirect('/')
+        else:
+            return render(request, self.template_name, context={
+                'post_form': form
+            })
     # def reg_post(request):
     #     if request.method == 'GET':
     #         return render(request, 'reg_post.html', context={
@@ -128,29 +146,56 @@ class RegPostView(CreateView):
     #             })
 
 
-def edit_post(request, id):
-    if request.method == 'GET':
-        return render(request, 'update_post.html', context={
-            'edit_form': PostForm,
-            'id': id
+class EditPostView(ListView, CreateView):
+    template_name = 'update_post.html'
+    queryset = Post.objects.all()
+    form_class = PostForm
+
+    def get(self, request, pk, *args):
+        return render(request, self.template_name, context={
+            'post_form': self.form_class,
+            'pk': pk
         })
 
-    elif request.method == 'POST':
-        form_edit = PostForm(request.POST)
-        if form_edit.is_valid():
-            post = Post.objects.get(id=id)
-            post.title = form_edit.cleaned_data.get('title')
-            post.description = form_edit.cleaned_data.get('description')
-            post.stars = form_edit.cleaned_data.get('stars')
-            post.type = form_edit.cleaned_data.get('type')
-            post.date = form_edit.cleaned_data.get('date')
-
-            post.save()
-
+    def post(self, request, pk, **kwargs):
+        form = self.form_class(request.POST)
+        instance = get_object_or_404(Post, pk=pk)
+        if form.is_valid():
+            instance.title = form.cleaned_data.get('title')
+            instance.description = form.cleaned_data.get('description')
+            instance.stars = form.cleaned_data.get('stars')
+            instance.type = form.cleaned_data.get('type')
+            instance.save()
             return redirect('/')
-
         else:
-            return render(request, 'update_post.html', context={
-                'edit_form': form_edit,
-                'id': id
+            return render(request, self.template_name, context={
+                'post_form': self.form_class,
+                'pk': pk
             })
+
+# def edit_post(request, id):
+#     if request.method == 'GET':
+#         return render(request, 'update_post.html', context={
+#             'edit_form': PostForm,
+#             'id': id
+#         })
+#
+#     elif request.method == 'POST':
+#         form_edit = PostForm(request.POST)
+#         if form_edit.is_valid():
+#             post = Post.objects.get(id=id)
+#             post.title = form_edit.cleaned_data.get('title')
+#             post.description = form_edit.cleaned_data.get('description')
+#             post.stars = form_edit.cleaned_data.get('stars')
+#             post.type = form_edit.cleaned_data.get('type')
+#             post.date = form_edit.cleaned_data.get('date')
+#
+#             post.save()
+#
+#             return redirect('/')
+#
+#         else:
+#             return render(request, 'update_post.html', context={
+#                 'edit_form': form_edit,
+#                 'id': id
+#             })

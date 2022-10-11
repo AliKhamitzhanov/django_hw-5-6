@@ -5,7 +5,7 @@
     <title>Update Post</title>
 </head>
 <body>
-    <form action="/posts/{{ id }}/edit/" method="post">
+    <form action="/posts/{{ pk }}/detail/edit/" method="post">
         {% csrf_token %}
         {{ edit_form.as_p }}
         <input type="submit" value="Изменить пост">

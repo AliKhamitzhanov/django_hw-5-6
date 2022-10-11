@@ -13,24 +13,42 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
-from posts.views import MainView, PostDetailView, RegPostView, edit_post
-from users.views import register_view, login_view, logout_view, set_password, personal_info
+from posts.views import MainView, RegPostView, PostDetailView, EditPostView
 from django.conf.urls.static import static
 from django.conf import settings
+from users.views import RegisterView, LoginView, LogoutView, PersonalView, ChangePass
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MainView.as_view()),
     path('posts/<pk>/detail/', PostDetailView.as_view()),
     path('posts/reg/', RegPostView.as_view()),
-    path('posts/<int:id>/edit/', edit_post),
-
-    path('users/<int:id>/change_password/', set_password),
-    path('personal/', personal_info),
-
-    path('users/register/', register_view),
-    path('users/login/', login_view),
-    path('users/logout/', logout_view)
+    path('users/register/', RegisterView.as_view()),
+    path('users/login/', LoginView.as_view()),
+    path('users/logout/', LogoutView.as_view()),
+    path('posts/<pk>/detail/edit/', EditPostView.as_view()),
+    path('users/<pk>/change_password/', ChangePass.as_view()),
+    path('personal/', PersonalView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# from posts.views import MainView, PostDetailView, RegPostView, edit_post
+# from users.views import register_view, login_view, logout_view, set_password, personal_info
+#
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('', MainView.as_view()),
+#     path('posts/<pk>/detail/', PostDetailView.as_view()),
+#     path('posts/reg/', RegPostView.as_view()),
+#     path('posts/<int:id>/edit/', edit_post),
+#
+#     path('users/<int:id>/change_password/', set_password),
+#     path('personal/', personal_info),
+#
+#     path('users/register/', register_view),
+#     path('users/login/', login_view),
+#     path('users/logout/', logout_view)
+# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
